@@ -4,6 +4,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HD5D3L9KZR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HD5D3L9KZR');
+</script>
 <title>AI as a Skill, Not a Tool Ealing Workshop</title>
 <meta name="description" content="A 75-minute workshop for Ealing business owners. One framework. Five tools. One cost in your business you didn't know you had.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d1f2d'/%3E%3Ctext x='16' y='22' font-family='Playfair Display, serif' font-size='20' font-weight='900' fill='%23c9a84c' text-anchor='middle'%3EAI%3C/text%3E%3C/svg%3E">
@@ -927,6 +935,13 @@ OPTION 3: GOOGLE SHEETS DIRECT (custom form + Google Sheets, free)
         method: 'POST',
         body: JSON.stringify(payload)
       });
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'waitlist_signup', {
+          event_category: 'engagement',
+          event_label: payload.sector || 'unspecified'
+        });
+      }
 
       form.style.display = 'none';
       success.style.display = 'block';
