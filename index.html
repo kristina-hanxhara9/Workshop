@@ -1,0 +1,950 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI as a Skill, Not a Tool Ealing Workshop</title>
+<meta name="description" content="A 75-minute workshop for Ealing business owners. One framework. Five tools. One cost in your business you didn't know you had.">
+<!-- 
+==============================================
+  DATA STORAGE READ THIS FIRST
+==============================================
+
+OPTION 1: AIRTABLE (recommended free, clean, easy to manage)
+  1. Go to airtable.com → sign up free
+  2. Create a new Base → add a Table called "Waitlist"
+  3. Add these fields: Name, Email, Business Name, Sector, Main Pain
+  4. Go to airtable.com/create/tokens → create a Personal Access Token
+     Scopes needed: data.records:write
+     Access: your base
+  5. Go to your base URL copy the Base ID (starts with "app...")
+  6. Replace AIRTABLE_API_KEY and AIRTABLE_BASE_ID below
+
+OPTION 2: GOOGLE FORMS (zero setup simplest possible)
+  1. Go to forms.google.com → create a new form
+  2. Add your questions (Name, Email, Business, Sector, Pain point)
+  3. Responses automatically go to a Google Sheet (Responses tab → open in Sheets)
+  4. Share the Google Form link use that as your QR code destination instead of this page
+  Note: you'd use Google's form design instead of this custom page
+
+OPTION 3: GOOGLE SHEETS DIRECT (custom form + Google Sheets, free)
+  1. Create a Google Sheet
+  2. Go to Extensions → Apps Script → paste the script from: github.com/dwyl/learn-to-send-email-via-google-script-without-server
+  3. Deploy as web app → copy the URL → use as form action
+==============================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1f2d;
+    --navy-mid: #162d41;
+    --gold: #c9a84c;
+    --gold-light: #e8cc80;
+    --cream: #f5f0e8;
+    --warm-white: #faf7f2;
+    --text: #1a1a1a;
+    --muted: #6b6560;
+    --border: #e0d8cc;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes lineGrow {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  .fade-up { animation: fadeUp .7s ease both; }
+  .delay-1 { animation-delay: .1s; }
+  .delay-2 { animation-delay: .22s; }
+  .delay-3 { animation-delay: .36s; }
+  .delay-4 { animation-delay: .5s; }
+  .delay-5 { animation-delay: .64s; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(13,31,45,.96);
+    backdrop-filter: blur(8px);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+    border-bottom: 1px solid rgba(201,168,76,.2);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: #fff;
+    letter-spacing: .02em;
+  }
+  .nav-brand span { color: var(--gold); }
+  .nav-cta {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid rgba(201,168,76,.4);
+    padding: 7px 16px;
+    border-radius: 2px;
+    transition: background .2s, color .2s;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--navy); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 1px; height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    opacity: .3;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px; height: 1px;
+    background: var(--gold);
+  }
+  .hero-h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 28px;
+    letter-spacing: -.01em;
+  }
+  .hero-h1 em {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,.6);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+  .hero-pills {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 52px;
+  }
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 7px 14px;
+    border-radius: 2px;
+  }
+  .pill.gold {
+    color: var(--gold);
+    border-color: rgba(201,168,76,.3);
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 32px;
+    border-radius: 2px;
+    transition: background .2s, transform .15s;
+  }
+  .hero-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .hero-cta svg { transition: transform .2s; }
+  .hero-cta:hover svg { transform: translateX(4px); }
+  .hero-scroll {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: rgba(255,255,255,.25);
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .hero-scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,.2), transparent);
+    animation: fadeUp 1s ease 1s both;
+  }
+
+  /* ── NUMBERS STRIP ── */
+  .numbers {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 40px;
+  }
+  .numbers-inner {
+    max-width: 860px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 0;
+  }
+  .num-item {
+    text-align: center;
+    padding: 0 20px;
+  }
+  .num-item + .num-item {
+    border-left: 1px solid var(--border);
+  }
+  .num-n {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .num-unit {
+    font-size: 16px;
+    color: var(--gold);
+    font-weight: 400;
+  }
+  .num-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ── SECTION BASE ── */
+  section { padding: 96px 40px; }
+  .section-inner { max-width: 860px; margin: 0 auto; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px;
+  }
+  .section-label::after {
+    content: '';
+    display: block; flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+  .section-sub {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  /* ── WHAT YOU GET ── */
+  .gets { background: var(--warm-white); }
+  .gets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 56px;
+  }
+  .get-card {
+    background: var(--warm-white);
+    padding: 36px 32px;
+    position: relative;
+  }
+  .get-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 16px;
+    user-select: none;
+  }
+  .get-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .get-body {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .get-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--gold);
+    transition: height .4s ease;
+  }
+  .get-card:hover::before { height: 100%; }
+
+  /* ── WHO IT'S FOR ── */
+  .who { background: var(--navy); }
+  .who .section-h2 { color: #fff; }
+  .who .section-sub { color: rgba(255,255,255,.5); }
+  .who-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 52px;
+  }
+  .who-card {
+    border: 1px solid rgba(255,255,255,.08);
+    padding: 24px;
+    border-radius: 2px;
+    transition: border-color .2s, background .2s;
+  }
+  .who-card:hover {
+    border-color: rgba(201,168,76,.3);
+    background: rgba(201,168,76,.04);
+  }
+  .who-icon {
+    width: 36px; height: 36px;
+    background: rgba(201,168,76,.1);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .who-icon svg { width: 18px; height: 18px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+  .who-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .who-desc {
+    font-size: 12px;
+    color: rgba(255,255,255,.35);
+    line-height: 1.6;
+  }
+  .who-not {
+    margin-top: 48px;
+    padding: 20px 24px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-left: 3px solid rgba(201,168,76,.4);
+    background: rgba(0,0,0,.2);
+  }
+  .who-not p {
+    font-size: 13px;
+    color: rgba(255,255,255,.4);
+    line-height: 1.7;
+  }
+  .who-not strong { color: rgba(255,255,255,.6); }
+
+  /* ── ABOUT ── */
+  .about { background: var(--cream); border-top: 1px solid var(--border); }
+  .about-inner {
+    max-width: 860px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 2fr; gap: 64px;
+    align-items: start;
+  }
+  .about-left { position: sticky; top: 80px; }
+  .about-avatar {
+    width: 80px; height: 80px;
+    background: var(--navy);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .about-avatar span {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+  }
+  .about-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .about-role {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .about-right p {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.85;
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+  .about-right p strong { color: var(--navy); font-weight: 500; }
+  .about-right blockquote {
+    border-left: 3px solid var(--gold);
+    padding-left: 20px;
+    margin: 28px 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--navy);
+    line-height: 1.5;
+  }
+
+  /* ── FORM ── */
+  .form-section {
+    background: var(--warm-white);
+    border-top: 1px solid var(--border);
+  }
+  .form-wrap {
+    max-width: 600px; margin: 0 auto;
+  }
+  .form-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .form-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 4px 32px rgba(0,0,0,.06);
+  }
+  .form-card-top {
+    background: var(--navy);
+    padding: 28px 36px;
+    border-bottom: 3px solid var(--gold);
+  }
+  .form-card-top h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .form-card-top p {
+    font-size: 13px;
+    color: rgba(255,255,255,.5);
+    line-height: 1.6;
+  }
+  .form-body { padding: 36px; }
+  .field { margin-bottom: 20px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 7px;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--warm-white);
+    outline: none;
+    transition: border-color .15s, background .15s;
+    -webkit-appearance: none;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--navy);
+    background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .submit-btn:hover { background: var(--navy-mid); transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn.loading { opacity: .7; pointer-events: none; }
+  .form-note {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 56px 36px;
+  }
+  .success-check {
+    width: 56px; height: 56px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .success-check svg { width: 24px; height: 24px; stroke: var(--navy); fill: none; stroke-width: 2.5; }
+  .success-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .success-state p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 380px;
+    margin: 0 auto;
+    font-weight: 300;
+  }
+  .success-state p strong { color: var(--navy); font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    padding: 36px 40px;
+    text-align: center;
+  }
+  footer p {
+    font-size: 12px;
+    color: rgba(255,255,255,.25);
+    line-height: 1.6;
+  }
+  footer a { color: rgba(255,255,255,.4); text-decoration: none; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    nav { padding: 0 20px; }
+    .hero { padding: 100px 24px 64px; }
+    section { padding: 64px 24px; }
+    .numbers { padding: 36px 24px; }
+    .about-inner { grid-template-columns: 1fr; gap: 32px; }
+    .about-left { position: static; }
+    .field-row { grid-template-columns: 1fr; }
+    .form-body { padding: 24px; }
+    .form-card-top { padding: 24px; }
+    footer { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">AI as a Skill<span>, Not a Tool</span></div>
+  <a href="#waitlist" class="nav-cta">Join the list</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow fade-up">Ealing · Small-group workshop</div>
+    <h1 class="hero-h1 fade-up delay-1">
+      Your business is probably paying<br>
+      for something <em>AI could replace<br>tomorrow.</em>
+    </h1>
+    <p class="hero-sub fade-up delay-2">
+      75 minutes. Small group. Local. Practical from day one.<br>
+      Find out what yours is.
+    </p>
+    <div class="hero-pills fade-up delay-3">
+      <div class="pill gold">75 minutes</div>
+      <div class="pill">Limited seats per session</div>
+      <div class="pill">Ealing-based</div>
+      <div class="pill">Framework you keep forever</div>
+    </div>
+    <a href="#waitlist" class="hero-cta fade-up delay-4">
+      Join the waitlist
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 8h10M9 4l4 4-4 4"/>
+      </svg>
+    </a>
+  </div>
+  <div class="hero-scroll fade-up delay-5">
+    <div class="hero-scroll-line"></div>
+    scroll
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<div class="numbers">
+  <div class="numbers-inner">
+    <div class="num-item">
+      <div class="num-n">75<span class="num-unit">min</span></div>
+      <div class="num-label">Total time</div>
+    </div>
+    <div class="num-item">
+      <div class="num-n">3</div>
+      <div class="num-label">Things to remember</div>
+    </div>
+    <div class="num-item">
+      <div class="num-n">1</div>
+      <div class="num-label">Thing you'll do tomorrow</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT YOU GET -->
+<section class="gets">
+  <div class="section-inner">
+    <div class="section-label">What you leave with</div>
+    <h2 class="section-h2">Not a course.<br>A skill.</h2>
+    <p class="section-sub">Most AI workshops teach you about AI. This one teaches you how to use it specifically, the one skill that makes every AI tool significantly more useful immediately.</p>
+    <div class="gets-grid">
+      <div class="get-card">
+        <div class="get-num">01</div>
+        <div class="get-title">One framework</div>
+        <div class="get-body">Role. Context. Output. Three things, in that order, every time. You'll use it from tomorrow morning and the habit compounds from there.</div>
+      </div>
+      <div class="get-card">
+        <div class="get-num">02</div>
+        <div class="get-title">Five tools, clearly mapped</div>
+        <div class="get-body">Copilot, Gemini, Perplexity, ChatGPT, Claude each built around a different kind of intelligence. You leave knowing exactly which one to open for which task.</div>
+      </div>
+      <div class="get-card">
+        <div class="get-num">03</div>
+        <div class="get-title">One cost identified</div>
+        <div class="get-body">Every person who has attended this session has left with one thing in their business they hadn't questioned before. A line item, a process, a recurring task. Worth examining.</div>
+      </div>
+      <div class="get-card">
+        <div class="get-num">04</div>
+        <div class="get-title">Three rules that protect you</div>
+        <div class="get-body">What not to share, when to verify, and where the accountability stays. The practical knowledge that keeps you safe while you move faster.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="who">
+  <div class="section-inner">
+    <div class="section-label" style="color:var(--gold);">Who this is for</div>
+    <h2 class="section-h2">Ealing businesses<br>with real work to do.</h2>
+    <p class="section-sub">This is not for people who want to understand AI in the abstract. It's for business owners and managers who have too much on their plate and not enough hours to do it.</p>
+    <div class="who-grid">
+      <div class="who-card">
+        <div class="who-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="who-name">Estate agents & letting</div>
+        <div class="who-desc">Listings, client comms, admin</div>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="who-name">Professional services</div>
+        <div class="who-desc">Solicitors, accountants, consultants</div>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div class="who-name">Healthcare & wellness</div>
+        <div class="who-desc">Dental, physio, clinics, opticians</div>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="who-name">Marketing & agencies</div>
+        <div class="who-desc">Producing more, faster, consistently</div>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="who-name">Recruitment</div>
+        <div class="who-desc">Job specs, screening, outreach</div>
+      </div>
+      <div class="who-card">
+        <div class="who-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="who-name">Education & tutoring</div>
+        <div class="who-desc">Lesson planning, parent comms</div>
+      </div>
+    </div>
+    <div class="who-not">
+      <p><strong>Who this isn't for:</strong> IT companies, software developers, data teams you probably already know most of this. This workshop is specifically for the businesses that have been watching AI from a distance and haven't yet found a version of it that fits the actual work they do.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about">
+  <div class="about-inner">
+    <div class="about-left">
+      <div class="about-avatar"><span>KH</span></div>
+      <div class="about-name">Kristina Hanxhara</div>
+      <div class="about-role">AI Solutions Architect<br>MSc Data Science &amp; Artificial Intelligence (in progress)<br>Based in West London</div>
+    </div>
+    <div class="about-right">
+      <p>
+        I don't teach AI from the outside. In my day job I design AI systems for large organisations the kind of work that involves replacing real costs, rebuilding real processes, and making sure the output is reliable enough to stake a business on.
+      </p>
+      <blockquote>
+        "Intelligence without context is useless whether that intelligence belongs to your team or to an AI."
+      </blockquote>
+      <p>
+        I'm completing a master's in Data Science and Artificial Intelligence which gives me a precise understanding of what these tools can and cannot do, and exactly where the practical habits that make them useful actually come from.
+      </p>
+      <p>
+        <strong>What I've seen, consistently:</strong> the gap between people who get genuine daily value from AI and people who gave up after one mediocre answer is almost never about capability. It's about briefing. This workshop teaches the briefing.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section" id="waitlist">
+  <div class="form-wrap">
+    <div class="form-header">
+      <div class="section-label" style="justify-content:center; max-width:320px; margin:0 auto 16px;">Waitlist</div>
+      <h2 class="section-h2" style="text-align:center;">Reserve your place<br>before it opens.</h2>
+      <p class="section-sub" style="margin:12px auto 0; text-align:center;">No booking yet I'm confirming interest first. Once the list is full I'll open the first session and you'll hear from me personally.</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-top">
+        <h3>Join the waitlist</h3>
+        <p>Takes 60 seconds. No payment, no commitment just your details so I can reach you when a date is confirmed.</p>
+      </div>
+      <div class="form-body">
+        <!-- 
+          HOW TO CONNECT THIS FORM TO REAL DATA STORAGE:
+          1. Go to formspree.io → sign up free → "New Form"
+          2. Copy your form ID (looks like: xpwzqrnb)
+          3. Replace YOUR_FORM_ID below with your actual ID
+          4. Done every submission emails you AND saves to your Formspree dashboard
+          
+          To also save to Google Sheets automatically:
+          In Formspree dashboard → Integrations → Google Sheets → connect
+        -->
+        <form id="waitlist-form">
+          <div class="field">
+            <label>Your name *</label>
+            <input type="text" id="f-name" placeholder="Your first name" required>
+          </div>
+          <div class="field">
+            <label>Email address *</label>
+            <input type="email" id="f-email" placeholder="you@yourbusiness.co.uk" required>
+          </div>
+          <div class="field">
+            <label>Business name *</label>
+            <input type="text" id="f-biz" placeholder="Your business name" required>
+          </div>
+          <div class="field">
+            <label>What sector are you in?</label>
+            <select id="f-sector">
+              <option value="" disabled selected>Select your sector</option>
+              <option>Estate agent / lettings</option>
+              <option>Legal / solicitors</option>
+              <option>Accounting / finance</option>
+              <option>Healthcare / dental / physio</option>
+              <option>Marketing / PR / creative</option>
+              <option>Recruitment</option>
+              <option>Education / tutoring</option>
+              <option>Retail</option>
+              <option>Restaurant / hospitality</option>
+              <option>Construction / trades</option>
+              <option>Consulting / professional services</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>What's eating most of your time right now?</label>
+            <textarea id="f-pain" placeholder="e.g. writing proposals, answering the same client emails, producing reports..." rows="3"></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="submit-btn">
+            Register my interest
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M3 8h10M9 4l4 4-4 4"/>
+            </svg>
+          </button>
+          <div class="form-note">No spam. No automated emails. When the date is confirmed you'll hear from Kristina personally.</div>
+        </form>
+
+        <div class="success-state" id="success-state">
+          <div class="success-check">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>You're on the list.</h3>
+          <p>I'll be in touch personally once I have enough people to confirm the first session. <strong>In the meantime:</strong> next time you're about to Google something for work, try Perplexity instead. Just to see the difference.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>AI as a Skill, Not a Tool · Ealing, West London<br>
+  <a href="mailto:kristinazhi97@gmail.com">kristinazhi97@gmail.com</a> &nbsp;·&nbsp; 
+  Questions? Reach out directly no bots, no forms.</p>
+</footer>
+
+<script>
+  /*
+  ── AIRTABLE SETUP (takes ~5 minutes, completely free) ──
+  1. airtable.com → sign up → New Base → name it "Workshop Waitlist"
+  2. Rename the default table to "Waitlist"
+  3. Set up these fields (Field name must match exactly):
+       Name          → Single line text
+       Email         → Email
+       Business      → Single line text
+       Sector        → Single line text
+       Pain          → Long text
+       Submitted At  → Date (include time)
+  4. airtable.com/create/tokens → New token
+       Name: anything
+       Scopes: data.records:write
+       Access: your base
+     Copy the token starts with "pat..."
+  5. Your Base ID is in the URL: airtable.com/YOUR_BASE_ID/...
+     It starts with "app"
+  6. Replace the two values below:
+  */
+
+  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby77gnjqhQooIOwaiMF7C__0xtjaA9v--XdVfOMBhTs0Qhr3vRCcmAkQfBgEl-Y8ChBaw/exec';
+
+  const form    = document.getElementById('waitlist-form');
+  const btn     = document.getElementById('submit-btn');
+  const success = document.getElementById('success-state');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const name  = document.getElementById('f-name').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const biz   = document.getElementById('f-biz').value.trim();
+
+    if (!name || !email || !biz) {
+      alert('Please fill in your name, email and business name.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const record = {
+      fields: {
+        'Name':         name,
+        'Email':        email,
+        'Business':     biz,
+        'Sector':       document.getElementById('f-sector').value || ' ',
+        'Pain':         document.getElementById('f-pain').value.trim() || ' ',
+        'Submitted At': new Date().toISOString()
+      }
+    };
+
+    try {
+      const res = await fetch(GOOGLE_APPS_SCRIPT_URL,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ records: [record] })
+        }
+      );
+
+      if (!res.ok) throw new Error(await res.text());
+
+      form.style.display = 'none';
+      success.style.display = 'block';
+
+    } catch (err) {
+      console.error(err);
+      btn.disabled = false;
+      btn.innerHTML = 'Register my interest <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+      alert('Something went wrong. Please email kristinazhi97@gmail.com directly and I\'ll add you to the list.');
+    }
+  });
+</script>
+
+</body>
+</html>
