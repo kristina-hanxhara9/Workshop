@@ -1,4 +1,8 @@
-
+Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+(index):1 Access to fetch at 'https://script.google.com/macros/s/AKfycbx8sCOpSvNiNFA_3fpwdHoOsznVv6RLesOkYD3wdcFS1lpdiFvMI6MC1yfz3X9ChcXWpw/exec' from origin 'http://workshop.butterfly-ai.co.uk' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+script.google.com/macros/s/AKfycbx8sCOpSvNiNFA_3fpwdHoOsznVv6RLesOkYD3wdcFS1lpdiFvMI6MC1yfz3X9ChcXWpw/exec:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+(index):941 TypeError: Failed to fetch
+    at HTMLFormElement.<anonymous> ((index):925:25)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -868,34 +872,13 @@ OPTION 3: GOOGLE SHEETS DIRECT (custom form + Google Sheets, free)
 </footer>
 
 <script>
-  /*
-  ── AIRTABLE SETUP (takes ~5 minutes, completely free) ──
-  1. airtable.com → sign up → New Base → name it "Workshop Waitlist"
-  2. Rename the default table to "Waitlist"
-  3. Set up these fields (Field name must match exactly):
-       Name          → Single line text
-       Email         → Email
-       Business      → Single line text
-       Sector        → Single line text
-       Pain          → Long text
-       Submitted At  → Date (include time)
-  4. airtable.com/create/tokens → New token
-       Name: anything
-       Scopes: data.records:write
-       Access: your base
-     Copy the token starts with "pat..."
-  5. Your Base ID is in the URL: airtable.com/YOUR_BASE_ID/...
-     It starts with "app"
-  6. Replace the two values below:
-  */
-
-  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8sCOpSvNiNFA_3fpwdHoOsznVv6RLesOkYD3wdcFS1lpdiFvMI6MC1yfz3X9ChcXWpw/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8sCOpSvNiNFA_3fpwdHoOsznVv6RLesOkYD3wdcFS1lpdiFvMI6MC1yfz3X9ChcXWpw/exec';
 
   const form    = document.getElementById('waitlist-form');
   const btn     = document.getElementById('submit-btn');
   const success = document.getElementById('success-state');
 
-  form.addEventListener('submit', async function(e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const name  = document.getElementById('f-name').value.trim();
@@ -910,33 +893,24 @@ OPTION 3: GOOGLE SHEETS DIRECT (custom form + Google Sheets, free)
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
-    const record = {
-      fields: {
-        'Name':         name,
-        'Email':        email,
-        'Business':     biz,
-        'Sector':       document.getElementById('f-sector').value || ' ',
-        'Pain':         document.getElementById('f-pain').value.trim() || ' ',
-        'Submitted At': new Date().toISOString()
-      }
+    const payload = {
+      name,
+      email,
+      business: biz,
+      sector: document.getElementById('f-sector').value || '',
+      pain:   document.getElementById('f-pain').value.trim() || ''
     };
 
     try {
-      const res = await fetch(GOOGLE_APPS_SCRIPT_URL,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ records: [record] })
-        }
-      );
-
-      if (!res.ok) throw new Error(await res.text());
+      // NO headers — sending Content-Type: application/json triggers CORS preflight
+      // which Apps Script can't handle. Plain text body = no preflight = works.
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
 
       form.style.display = 'none';
       success.style.display = 'block';
-
     } catch (err) {
       console.error(err);
       btn.disabled = false;
